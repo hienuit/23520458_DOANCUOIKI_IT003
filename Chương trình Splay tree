@@ -1,0 +1,158 @@
+#include<bits/stdc++.h>
+using namespace std;
+
+struct Node{
+    int K;
+    Node *left,*right;
+};
+
+
+Node *KhoiTao(int K)
+{
+    Node *node=new Node();
+    node->K=K;
+    node->left=NULL;
+    node->right=NULL;
+    return node;
+}
+
+
+Node  *QuayPhai(Node *x)
+{
+    Node *y = x->left;
+    x->left = y->right;
+    y->right = x;
+    return y;
+}
+
+Node *QuayTrai(Node *x)
+{
+    Node *y=x->right;
+    x->right=y->left;
+    y->left=x;
+    return y;
+}
+//Hàm Splay nút
+Node* Splay(Node* root, int K) {
+    if (root == NULL || root->K == K)
+        return root;
+
+    if (root->K > K) {
+        if (root->left == NULL)
+            return root;
+        if (root->left->K > K) {
+            root->left->left = Splay(root->left->left, K);
+            root = QuayPhai(root);
+        }
+        else if (root->left->K < K) {
+            root->left->right = Splay(root->left->right, K);
+            if (root->left->right != NULL)
+                root->left = QuayTrai(root->left);
+        }
+        return (root->left == NULL) ? root : QuayPhai(root);
+    }
+    else {
+        if (root->right == NULL)
+            return root;
+        if (root->right->K > K) {
+            root->right->left = Splay(root->right->left, K);
+            if (root->right->left != NULL)
+                root->right = QuayPhai(root->right);
+        }
+        else if (root->right->K < K) {
+            root->right->right = Splay(root->right->right, K);
+            root = QuayTrai(root);
+        }
+        return (root->right == NULL) ? root : QuayTrai(root);
+    }
+}
+//Hàm chèn mới một nút vào cây
+Node* ChenNode(Node* root, int K) {
+    if (root == NULL)
+        return KhoiTao(K);
+
+    root = Splay(root, K);
+
+    if (root->K == K)
+        return root;
+
+    Node* node = KhoiTao(K);
+    if (root->K > K) {
+        node->right = root;
+        node->left = root->left;
+        root->left = NULL;
+    }
+    else {
+        node->left = root;
+        node->right = root->right;
+        root->right = NULL;
+    }
+    return node;
+}
+//Hàm xóa một nút khỏi cây
+Node* XoaNode(Node* root, int K) {
+    if (root == NULL)
+        return root;
+
+    root = Splay(root, K);
+
+    if (root->K != K)
+        return root;
+
+
+    if (root->left == NULL) {
+        Node* temp = root->right;
+        delete root;
+        return temp;
+    }
+
+    else if (root->right == NULL) {
+        Node* temp = root->left;
+        delete root;
+        return temp;
+    }
+    else {
+        Node* temp = root->left;
+        while (temp->right != NULL)
+            temp = temp->right;
+
+        root->K = temp->K;
+
+        root->left = XoaNode(root->left, temp->K);
+    }
+    return root;
+}
+//Hàm duyệt cây
+void DuyetTrungTu(Node* node) {
+    if (node != NULL) {
+
+       DuyetTrungTu(node->left);
+        cout << node->K << " ";
+        DuyetTrungTu(node->right);
+
+    }
+}
+
+int main()
+{
+     Node* root = NULL;
+     int n;
+     cin>>n;
+     int a[n];
+
+     for(int i=0;i<n;i++)
+     {
+         cin>>a[i];
+     }
+     for(int i=0;i<n;i++)
+     {
+         root=ChenNode(root, a[i]);
+     }
+       DuyetTrungTu(root);
+     int m;
+     cin>>m;
+     root=XoaNode(root,m);
+    DuyetTrungTu(root);
+     return 0;
+
+}
