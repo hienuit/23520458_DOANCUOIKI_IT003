@@ -148,7 +148,7 @@ int main()
      {
          root=ChenNode(root, a[i]);
      }
-       DuyetTrungTu(root);
+        DuyetTrungTu(root);
      int m;
      cin>>m;
      root=XoaNode(root,m);
