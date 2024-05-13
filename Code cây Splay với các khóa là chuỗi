@@ -1,0 +1,117 @@
+#include <bits/stdc++.h>
+
+using namespace std;
+
+struct Node {
+    string K;
+    Node* left;
+    Node* right;
+
+    Node(string K) : K(K), left(NULL), right(NULL) {}
+};
+
+Node* QuayPhai(Node* node) {
+    Node* y = node->left;
+    node->left = y->right;
+    y->right = node;
+    return y;
+}
+
+Node* QuayTrai(Node* node) {
+    Node* y = node->right;
+    node->right = y->left;
+    y->left = node;
+    return y;
+}
+
+Node* splay(string K, Node* root) {
+    if (root == NULL || root->K == K)
+        return root;
+
+    if (K < root->K) {
+        if (root->left == NULL)
+            return root;
+        if (K < root->left->K) {
+            root->left->left = splay(K, root->left->left);
+            root = QuayPhai(root);
+        } else if (K > root->left->K) {
+            root->left->right = splay(K, root->left->right);
+            if (root->left->right != NULL)
+                root->left = QuayTrai(root->left);
+        }
+        return (root->left == NULL) ? root : QuayPhai(root);
+    } else {
+        if (root->right == NULL)
+            return root;
+        if (K < root->right->K) {
+            root->right->left = splay(K, root->right->left);
+            if (root->right->left != NULL)
+                root->right = QuayPhai(root->right);
+        } else if (K > root->right->K) {
+            root->right->right = splay(K, root->right->right);
+            root = QuayTrai(root);
+        }
+        return (root->right == NULL) ? root : QuayTrai(root);
+    }
+}
+
+Node* ChenNode(Node* root, string K) {
+    if (root == NULL) {
+        return new Node(K);
+    }
+    root = splay(K, root);
+    if (K < root->K) {
+        Node* node = new Node(K);
+        node->right = root;
+        node->left = root->left;
+        root->left = NULL;
+        root = node;
+    } else if (K > root->K) {
+        Node* node = new Node(K);
+        node->left = root;
+        node->right = root->right;
+        root->right = NULL;
+        root = node;
+    }
+    return root;
+}
+
+bool TimKiem(Node* root, string K) {
+    root = splay(K, root);
+    return (root != NULL && root->K == K);
+}
+
+
+void DuyetTrungTu(Node* root) {
+    if (root) {
+        DuyetTrungTu(root->left);
+        cout << root->K << endl;;
+        DuyetTrungTu(root->right);
+    }
+}
+
+int main() {
+    Node* root = NULL;
+    vector<string> arr;
+    string str;
+    while(true)
+    {
+
+        getline(cin,str);
+        if(str=="done") break;
+        arr.push_back(str);
+    }
+    int n=arr.size();
+
+
+    for(int i=0;i<n;i++)
+    {
+        root=ChenNode(root,arr[i]);
+    }
+    DuyetTrungTu(root);
+
+    string s;
+    getline(cin,s);
+    cout<<TimKiem(root,s);
+    return 0;
+}
