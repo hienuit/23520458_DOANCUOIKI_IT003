@@ -34,16 +34,20 @@ Node *QuayTrai(Node *x)
 }
 //Hàm Splay nút
 Node* Splay(Node* root, int K) {
+//Nếu cây rỗng hoặc là khóa k tồn tại ở góc.
     if (root == NULL || root->K == K)
         return root;
-
+//Khóa nằm ở cây con trái
     if (root->K > K) {
+//Nếu khóa không tồn tại, trả về giá trị gốc.
         if (root->left == NULL)
             return root;
+//quay trái double
         if (root->left->K > K) {
             root->left->left = Splay(root->left->left, K);
             root = QuayPhai(root);
         }
+//zig - zag
         else if (root->left->K < K) {
             root->left->right = Splay(root->left->right, K);
             if (root->left->right != NULL)
@@ -51,14 +55,17 @@ Node* Splay(Node* root, int K) {
         }
         return (root->left == NULL) ? root : QuayPhai(root);
     }
+//khóa nằm bên cây con phải
     else {
         if (root->right == NULL)
             return root;
+//zag-zig
         if (root->right->K > K) {
             root->right->left = Splay(root->right->left, K);
             if (root->right->left != NULL)
                 root->right = QuayPhai(root->right);
         }
+//zag-zag
         else if (root->right->K < K) {
             root->right->right = Splay(root->right->right, K);
             root = QuayTrai(root);
@@ -122,6 +129,11 @@ Node* XoaNode(Node* root, int K) {
     }
     return root;
 }
+//Hàm tìm kiếm
+Node *TimKiem(Node *root, int K) 
+{ 
+    return Splay(root, K); 
+} 
 //Hàm duyệt cây
 void DuyetTrungTu(Node* node) {
     if (node != NULL) {
@@ -149,10 +161,5 @@ int main()
          root=ChenNode(root, a[i]);
      }
         DuyetTrungTu(root);
-     int m;
-     cin>>m;
-     root=XoaNode(root,m);
-    DuyetTrungTu(root);
-     return 0;
-
+  
 }
